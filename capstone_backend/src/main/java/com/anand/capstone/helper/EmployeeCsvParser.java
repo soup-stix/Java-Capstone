@@ -21,7 +21,7 @@ public class EmployeeCsvParser {
         try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
             String[] line;
             while ((line = reader.readNext()) != null) {
-                // Assuming CSV format: firstName,lastName,email,dateOfJoining
+                // Assuming CSV format: firstName,lastName,email,dateOfJoining,grade
                 Employee employee = new Employee();
                 employee.setFirstName(line[0]);
                 employee.setLastName(line[1]);
@@ -30,11 +30,11 @@ public class EmployeeCsvParser {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date dateOfJoining = new Date(dateFormat.parse(line[3]).getTime());
                 employee.setDateOfJoining(dateOfJoining);
+                // Set grade
+                employee.setGrade(line[4]);
                 employees.add(employee);
             }
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        } catch (CsvValidationException e) {
+        } catch (ParseException | CsvValidationException e) {
             throw new RuntimeException(e);
         }
         return employees;

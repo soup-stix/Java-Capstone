@@ -7,10 +7,12 @@ import com.anand.capstone.service.EmployeeService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -51,19 +53,16 @@ public class EmployeeController {
         employeeService.updateEmployee(id, employee);
     }
 
-    @PostMapping("/uploadCsv")
-    public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("Please upload a CSV file.");
-        }
-
+    @PostMapping(value = "/uploadCsv", consumes = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> uploadCsv(@RequestBody String csvData) {
+        // Parse the CSV data and save employees
         try {
-            List<Employee> employees = employeeCsvParser.parseCsv(file.getInputStream());
+            List<Employee> employees = employeeCsvParser.parseCsv(new ByteArrayInputStream(csvData.getBytes()));
             employeeService.saveAllEmployees(employees);
-            return ResponseEntity.ok().body("CSV file uploaded successfully.");
+            return ResponseEntity.ok().body("CSV data uploaded successfully.");
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload CSV file.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload CSV data.");
         }
     }
 
