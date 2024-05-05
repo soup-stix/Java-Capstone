@@ -13,6 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.anand.capstone.entity.User;
+import com.anand.capstone.repository.UserRepository;
+
 
 @RestController
 @RequestMapping("/api/v1/employees")
@@ -25,6 +31,11 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeCsvExporter employeeCsvExporter;
+
+    private User user;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping
     public List<Employee> getAllEmployees() {
@@ -66,6 +77,19 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload CSV file.");
         }
     }
+
+    @PostMapping("/register")
+    public String register(@RequestBody String username, @RequestBody String password) {
+        //TODO: process POST request
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setRole("USER");
+        user.setEnabled(true);
+        userRepository.save(user);
+        return "User registered successfully!";
+        
+    }
+    
 
     @GetMapping("/search")
     public ResponseEntity<List<Employee>> searchEmployees(@RequestParam(required = false) String firstName,
